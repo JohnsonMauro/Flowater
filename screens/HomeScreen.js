@@ -5,6 +5,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -12,8 +13,20 @@ import {
 import { Icon, WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
+// import { firebase } from '../firebase/config';
+// import firebase from 'expo-firebase-app'
 
 export default class HomeScreen extends React.Component {
+  // ref = firebase.firestore().collection('iot-ionic-3724a');
+
+  state = { switchValue: false };
+  toggleSwitch = (value) => {
+    //onValueChange of the switch this function will be called
+    this.setState({switchValue: value})
+    //state changes according to switch
+    //which will result in re-render the text
+  }
+
   static navigationOptions = {
     header: null,
   };
@@ -23,72 +36,41 @@ export default class HomeScreen extends React.Component {
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
-          <Icon.Ionicons
-            name={Platform.OS === 'ios'
-                    ? `ios-power${focused ? '' : '-outline'}`
-                    : 'md-power'}
-            size={400}
-            style={{ marginBottom: -3 }}
-            color={'green'}
-          />
+            <Icon.Ionicons
+              name={Platform.OS === 'ios'
+                      ? `ios-power${focused ? '' : '-outline'}`
+                      : 'md-power'}
+              size={300}
+              style={{ marginBottom: -3 }}
+              color={this.state.switchValue ? 'green' : 'red'}
+            />
+            <Switch
+              style={{marginTop:30, transform: [{ scaleX: 3 }, { scaleY: 3 }]}}
+              onValueChange = {this.toggleSwitch}
+              value = {this.state.switchValue}
+            />
           </View>
 
           <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
-
             <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
+              No momento não tem água.
             </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
+            <Icon.Ionicons
+              name={Platform.OS === 'ios'
+                      ? `ios-water${focused ? '' : '-outline'}`
+                      : 'md-water'}
+              size={100}
+              style={{ marginBottom: -3 }}
+              color={this.state.switchValue ? 'blue' : '#EEEEEE'}
+            />
+            <Text style={styles.getStartedText} >
+              0 L/h
+            </Text>
           </View>
         </ScrollView>
       </View>
     );
   }
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
-  }
-
-  _handleLearnMorePress = () => {
-    WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
-
-  _handleHelpPress = () => {
-    WebBrowser.openBrowserAsync(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const styles = StyleSheet.create({
@@ -121,6 +103,7 @@ const styles = StyleSheet.create({
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,
+    marginTop: 80,
   },
   homeScreenFilename: {
     marginVertical: 7,
