@@ -14,17 +14,36 @@ import { Icon, WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 // import { firebase } from '../firebase/config';
-// import firebase from 'expo-firebase-app'
+import firebase from 'firebase';
 
 export default class HomeScreen extends React.Component {
-  // ref = firebase.firestore().collection('iot-ionic-3724a');
+  constructor(props) {
+    super(props);
+    this.state = {
+      flow: 0,
+      switchValue: 0
+    };
+  }
 
-  state = { switchValue: false };
+  componentWillMount() {
+    const firebaseConfig = {
+      apiKey: "AIzaSyClu7rYMShX2Yy1xNhhIsl_aPw33XuBW2E",
+      authDomain: "iot-ionic-3724a.firebaseapp.com",
+      databaseURL: "https://iot-ionic-3724a.firebaseio.com",
+      storageBucket: "iot-ionic-3724a.appspot.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    
+    firebase.database().ref('ESP8266_Test').on('value', (data) => this.setState({flow: data.val().int.data}));
+  }
+
+  componentDidUpdate() {
+    firebase.database().ref('ESP8266_Test/flowPump').set({on: this.state.flow ? this.state.switchValue : 0});
+  }
+
   toggleSwitch = (value) => {
-    //onValueChange of the switch this function will be called
-    this.setState({switchValue: value})
-    //state changes according to switch
-    //which will result in re-render the text
+    this.setState({switchValue: value ? 1 : 0})
+    firebase.database().ref('ESP8266_Test/flowPump').set({on: !this.state.switchValue ? 1 : 0});
   }
 
   static navigationOptions = {
@@ -42,18 +61,19 @@ export default class HomeScreen extends React.Component {
                       : 'md-power'}
               size={300}
               style={{ marginBottom: -3 }}
-              color={this.state.switchValue ? 'green' : 'red'}
+              color={this.state.switchValue && this.state.flow != 0 ? 'green' : 'red'}
             />
             <Switch
               style={{marginTop:30, transform: [{ scaleX: 3 }, { scaleY: 3 }]}}
               onValueChange = {this.toggleSwitch}
-              value = {this.state.switchValue}
+              value = {this.state.flow == 0 ? false : this.state.switchValue}
+              disabled = {this.state.flow == 0}
             />
           </View>
 
           <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>
-              No momento não tem água.
+              {this.state.flow == 0 ? 'No momento não tem água.' : 'No momento tem água.'}
             </Text>
             <Icon.Ionicons
               name={Platform.OS === 'ios'
@@ -61,10 +81,10 @@ export default class HomeScreen extends React.Component {
                       : 'md-water'}
               size={100}
               style={{ marginBottom: -3 }}
-              color={this.state.switchValue ? 'blue' : '#EEEEEE'}
+              color={this.state.flow > 0 ? 'blue' : '#EEEEEE'}
             />
-            <Text style={styles.getStartedText} >
-              0 L/h
+            <Text style={styles.getStartedText}>
+              {this.state.flow} L/h
             </Text>
           </View>
         </ScrollView>

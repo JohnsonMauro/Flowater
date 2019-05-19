@@ -12,5 +12,5 @@ const firebaseConfig = {
 const firebaseConnection = firebase.initializeApp(firebaseConfig);
 
 export default {
-    firebaseConnection
+  firebaseConfig
 };
