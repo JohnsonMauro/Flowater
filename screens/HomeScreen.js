@@ -21,7 +21,7 @@ export default class HomeScreen extends React.Component {
     super(props);
     this.state = {
       flow: 0,
-      switchValue: 0
+      switchValue: false
     };
   }
 
@@ -37,12 +37,12 @@ export default class HomeScreen extends React.Component {
     firebase.database().ref('ESP8266_Test').on('value', (data) => this.setState({flow: data.val().int.data}));
   }
 
-  componentDidUpdate() {
-    firebase.database().ref('ESP8266_Test/flowPump').set({on: this.state.flow ? this.state.switchValue : 0});
-  }
+  // componentDidUpdate() {
+  //   firebase.database().ref('ESP8266_Test/flowPump').set({on: this.state.flow > 0 ? this.state.switchValue : 0});
+  // }
 
   toggleSwitch = (value) => {
-    this.setState({switchValue: value ? 1 : 0})
+    this.setState({switchValue: value})
     firebase.database().ref('ESP8266_Test/flowPump').set({on: !this.state.switchValue ? 1 : 0});
   }
 
@@ -66,7 +66,7 @@ export default class HomeScreen extends React.Component {
             <Switch
               style={{marginTop:30, transform: [{ scaleX: 3 }, { scaleY: 3 }]}}
               onValueChange = {this.toggleSwitch}
-              value = {this.state.flow == 0 ? false : this.state.switchValue}
+              value = {this.state.switchValue}
               disabled = {this.state.flow == 0}
             />
           </View>
